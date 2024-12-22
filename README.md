@@ -1,3 +1,2 @@
-# This is the readme file
-# arun-garments-repo
-Used to host the Arun garments input form for sample.
+# Sample application test for hosting at public
+Capture the input form datas.
