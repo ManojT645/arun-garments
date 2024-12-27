@@ -41,43 +41,135 @@
 
 <body>
     <form id="dataForm">
-        <label for="name">Name:</label>
+        <!-- <label for="name">Name:</label>
         <input type="text" id="name" name="name" required>
         <br>
+        
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required>
+        <br> -->
+
+        <label for="operation">Operation:</label>
+        <select id="operation">
+            <option value="" disabled selected>Select Operation</option>
+        </select>
         <br>
-        <label for="email">Operation:</label>
-        <select id="dropdown"></select>
+
+        <label for="employee">Employee Name:</label>
+        <select id="employee">
+            <option value="" disabled selected>Select Employee Name</option>
+        </select>
         <br>
+
+        <label for="job">Job:</label>
+        <select id="job">
+            <option value="" disabled selected>Select Job</option>
+        </select>
+        <br>
+
+        <!-- TODO: Make sure it should load the current date -->
+        <label for="date">Select a date:</label>
+        <input type="date" id="workdate" name="date">
+        <br>
+
+        <label for="quantity">Number of pieces:</label>
+        <input type="number" id="quantity" name="quantity" min="1" max="10000">
+        <br>
+
+        <label for="ponumber">Purchase Order No:</label>
+        <select id="ponumber">
+            <option value="" disabled selected>Select P.O No</option>
+        </select>
+        <br>
+        <!-- TODO: Show the cost multiply with cost -->
         <button type="submit">Submit</button>
     </form>
+    <!-- TODO: Rename 'Operations' as 'Jobs'
+    TODO: Fetch the Purchase order number from masterData -->
+    <!-- {"PowerTable":{"Employees":["",""],"Operations":[{"Name":"","Cost":0.3},{"Name":"","Cost":0.4}]},"Singer":{"Employees":["",""],"Operations":[{"Name":"","Cost":0.3},{"Name":"","Cost":0.4}]}} -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const dropdown = document.getElementById('dropdown');
+        var masterData = {}; // readonly - Response from API
+        var operationNames = []; // readonly - String array that contains only operation names 
+        var poNumbers = []; // readonly - String array that contains only purchase order numbers
+        var api = 'https://script.google.com/macros/s/AKfycbySyu0tvHg4vSr_4anegloAQHnHYu3rLfx2rzquT0nQOYyB0bCRI9xyuwy7N-1c-3JJsQ/exec'
 
-            fetch('https://script.google.com/macros/s/AKfycbzTtIqq8I6ZkLQWW8LF9O85zlAI2Uf_6fPjHkQc1uSiLjnkNIiy6omZSXx5ec9LgAETuA/exec')
-                .then(response => response.json())
-                .then(data => {
-                    // Extract keys from the response object
-                    const keys = Object.keys(data);
+        function clearDropdown(dropdownElement) {
+            // Remove all child elements except the first one
+            while (dropdownElement.children.length > 1) {
+                dropdownElement.removeChild(dropdownElement.lastChild);
+            }
+        }
 
-                    // Populate the dropdown with the keys
-                    keys.forEach(key => {
-                        const option = document.createElement('option');
-                        option.value = key;
-                        option.textContent = key;
-                        dropdown.appendChild(option);
+        function extractData(operation) {
+            const employees = [];
+            const jobNames = [];
+
+            if (data[operation]) {
+                if (data[operation].Employees) {
+                    employees.push(...data[operation].Employees);
+                }
+                else {
+                    console.error(`Employees object of "${operation}" Operation is not found in data.`);
+                }
+                // Extract operation names
+                if (data[operation].Jobs) {
+                    data[operation].Jobs.forEach(operation => {
+                        jobNames.push(operation.Name);
                     });
-                })
+                }
+                else {
+                    console.error(`Jobs object of "${operation}" Operation is not found in data.`);
+                }
+            } else {
+                console.error(`Operation named "${operation}" not found in data.`);
+            }
+
+            return { employees, jobNames };
+        }
+
+        function loadOptionToDropdown(sourceData, dropdownElementId) {
+            const dropdownElement = document.getElementById(dropdownElementId);
+            clearDropdown(dropdownElement);
+            sourceData.forEach(optionData => {
+                const option = document.createElement('option');
+                option.value = optionData;
+                option.textContent = optionData;
+                dropdownElement.appendChild(option);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch(api).then(response => response.json()).then(data => {
+                masterData = data;
+                operationNames = Object.keys(data.Operations);
+                poNumbers = data.PONumbers;
+                Object.freeze(masterData);
+                Object.freeze(operationNames);
+                Object.freeze(poNumbers);
+
+                loadOptionToDropdown(operationNames, 'operation');
+                loadOptionToDropdown(poNumbers, 'ponumber');
+            })
                 .catch(error => {
                     console.error('Error:', error);
                 });
         });
+
+        document.getElementById('operation').addEventListener('change', function () {
+            var operation = this.value;
+            console.log({ operation });
+
+            const { employees, jobNames } = extractData(operation);
+            console.log({ employees }, { jobNames });
+
+            loadOptionToDropdown(jobNames, 'job');
+            loadOptionToDropdown(employees, 'employee');
+        });
+
         document.getElementById('dataForm').addEventListener('submit', function (event) {
             event.preventDefault();
             var formData = new FormData(event.target);
-            fetch('https://script.google.com/macros/s/AKfycby7WqTy69NG31mlwhNiVNzTINKRp7_SlNGbfvDq1BFZ7NiGQAj_7JEDIGjlYKuiC5_kvw/exec', {
+            fetch(api, {
                 method: 'POST',
                 body: formData
             }).then(response => response.text())
