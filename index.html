@@ -104,16 +104,16 @@
             const employees = [];
             const jobNames = [];
 
-            if (data[operation]) {
-                if (data[operation].Employees) {
-                    employees.push(...data[operation].Employees);
+            if (masterData.Operations[operation]) {
+                if (masterData.Operations[operation].Employees) {
+                    employees.push(...masterData.Operations[operation].Employees);
                 }
                 else {
                     console.error(`Employees object of "${operation}" Operation is not found in data.`);
                 }
                 // Extract operation names
-                if (data[operation].Jobs) {
-                    data[operation].Jobs.forEach(operation => {
+                if (masterData.Operations[operation].Jobs) {
+                    masterData.Operations[operation].Jobs.forEach(operation => {
                         jobNames.push(operation.Name);
                     });
                 }
@@ -146,7 +146,7 @@
                 Object.freeze(masterData);
                 Object.freeze(operationNames);
                 Object.freeze(poNumbers);
-
+                
                 loadOptionToDropdown(operationNames, 'operation');
                 loadOptionToDropdown(poNumbers, 'ponumber');
             })
