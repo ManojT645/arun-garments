@@ -41,13 +41,13 @@
 
 <body>
     <form id="dataForm">
-        <!-- <label for="name">Name:</label>
+        <label for="name">Name:</label>
         <input type="text" id="name" name="name" required>
         <br>
         
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required>
-        <br> -->
+        <br>
 
         <label for="operation">Operation:</label>
         <select id="operation">
@@ -168,8 +168,9 @@
 
         document.getElementById('dataForm').addEventListener('submit', function (event) {
             event.preventDefault();
+            console.log({...event});
             var formData = new FormData(event.target);
-            console.log({formData});
+            console.log({...formData});
             fetch(api, {
                 method: 'POST',
                 body: formData
