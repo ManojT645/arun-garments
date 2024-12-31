@@ -162,12 +162,18 @@
                 Object.freeze(operationNames);
                 Object.freeze(poNumbers);
 
+                loadOptionToDropdown(operationNames, 'operation');
+                loadOptionToDropdown(poNumbers, 'ponumber');
+
+                //#region Set current date
                 const dateInput = document.getElementById('workdate');
                 const today = new Date().toISOString().split('T')[0];
                 dateInput.value = today;
 
-                loadOptionToDropdown(operationNames, 'operation');
-                loadOptionToDropdown(poNumbers, 'ponumber');
+                document.getElementById('dataForm').addEventListener('reset', () => {
+                    dateInput.value = today;
+                });
+                //#endregion
             }).catch(error => {
                 console.error('Error:', error);
             });
