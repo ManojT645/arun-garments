@@ -87,13 +87,13 @@
     </form>
     <!-- TODO: Rename 'Operations' as 'Jobs'
     TODO: Fetch the Purchase order number from masterData -->
-    <!-- {"PowerTable":{"Employees":["",""],"Operations":[{"Name":"","Cost":0.3},{"Name":"","Cost":0.4}]},"Singer":{"Employees":["",""],"Operations":[{"Name":"","Cost":0.3},{"Name":"","Cost":0.4}]}} -->
     <script>
         var masterData = {}; // readonly - Response from API
         var operationNames = []; // readonly - String array that contains only operation names 
         var poNumbers = []; // readonly - String array that contains only purchase order numbers
-        var api = 'https://script.google.com/macros/s/AKfycbySyu0tvHg4vSr_4anegloAQHnHYu3rLfx2rzquT0nQOYyB0bCRI9xyuwy7N-1c-3JJsQ/exec'
-
+        // var api = 'https://script.google.com/macros/s/AKfycbySyu0tvHg4vSr_4anegloAQHnHYu3rLfx2rzquT0nQOYyB0bCRI9xyuwy7N-1c-3JJsQ/exec'
+        var api = secrets.APPSCRIPTENDPOINT;
+        console.log({api});
         function clearDropdown(dropdownElement) {
             // Remove all child elements except the first one
             while (dropdownElement.children.length > 1) {
@@ -147,11 +147,10 @@
                 Object.freeze(masterData);
                 Object.freeze(operationNames);
                 Object.freeze(poNumbers);
-                
+
                 loadOptionToDropdown(operationNames, 'operation');
                 loadOptionToDropdown(poNumbers, 'ponumber');
-            })
-                .catch(error => {
+            }).catch(error => {
                     console.error('Error:', error);
                 });
         });
@@ -169,9 +168,9 @@
 
         document.getElementById('dataForm').addEventListener('submit', function (event) {
             event.preventDefault();
-            console.log({...event});
+            console.log({ ...event });
             var formData = new FormData(event.target);
-            console.log({...formData});
+            console.log({ ...formData });
             fetch(api, {
                 method: 'POST',
                 body: formData
