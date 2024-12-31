@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
     <title>Arun Garments Job Entry</title>
     <!-- TODO: Load Favicon -->
     <style>
@@ -42,9 +44,15 @@
 
 <body>
     <form id="dataForm">
-        <label for="operation">Operation:</label>
-        <select id="operation" name="operation">
-            <option value="" disabled selected>Select Operation</option>
+
+        <!-- TODO: Make sure it should load the current date -->
+        <label for="date">Select a date:</label>
+        <input type="date" id="workdate" name="workdate">
+        <br>
+
+        <label for="ponumber">Purchase Order No:</label>
+        <select id="ponumber" name="ponumber">
+            <option value="" disabled selected>Select P.O No</option>
         </select>
         <br>
 
@@ -54,36 +62,41 @@
         </select>
         <br>
 
+        <label for="operation">Operation:</label>
+        <select id="operation" name="operation">
+            <option value="" disabled selected>Select Operation</option>
+        </select>
+        <br>
+
         <label for="job">Job:</label>
         <select id="job" name="job">
             <option value="" disabled selected>Select Job</option>
         </select>
         <br>
 
-        <!-- TODO: Make sure it should load the current date -->
-        <label for="date">Select a date:</label>
-        <input type="date" id="workdate" name="workdate">
-        <br>
-
         <label for="quantity">Number of pieces:</label>
         <input type="number" id="quantity" name="quantity" min="1" max="10000">
         <br>
 
-        <label for="ponumber">Purchase Order No:</label>
-        <select id="ponumber" name="ponumber">
-            <option value="" disabled selected>Select P.O No</option>
-        </select>
-        <br>
         <!-- TODO: Show the cost multiply with cost -->
+        <label for="amount">Amount:</label>
+        <input type="number" disabled id="amount" name="amount">
+        <br>
+
         <button type="submit">Submit</button>
     </form>
-    <!-- TODO: Rename 'Operations' as 'Jobs'
-    TODO: Fetch the Purchase order number from masterData -->
     <script>
         var masterData = {}; // readonly - Response from API
         var operationNames = []; // readonly - String array that contains only operation names 
         var poNumbers = []; // readonly - String array that contains only purchase order numbers
-        var api = 'aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J5NTZmZkUwWmY4Zm9nRk00S2VOZWNLSkFQd2FfNWwwbGxqMlZna0lpSTJYajRYZk9OTjI3ZG1BSGNwRjJhS0hKbnhKZy9leGVj'
+        var api = 'aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J4S0NBMTl2SHlGQ0NxNGN1S2dtVktuV2Z1N1lYVFNZYTdLdGxMRkF5Qk9ERURpS1ZRaGdrdVpFaGtJckxiRlI5dlI1US9leGVj';
+        var availableJobs = [];
+        var availableJobRates = [];
+        var selectedOperation = '';
+        var selectedJob = '';
+        var selectedJobRate = 0;
+        var noOfQuantity = 0;
+
 
         function clearDropdown(dropdownElement) {
             // Remove all child elements except the first one
@@ -95,6 +108,7 @@
         function extractData(operation) {
             const employees = [];
             const jobNames = [];
+            const jobRates = []; // rate store against each jobName index position
 
             if (masterData.Operations[operation]) {
                 if (masterData.Operations[operation].Employees) {
@@ -105,8 +119,9 @@
                 }
                 // Extract operation names
                 if (masterData.Operations[operation].Jobs) {
-                    masterData.Operations[operation].Jobs.forEach(operation => {
-                        jobNames.push(operation.Name);
+                    masterData.Operations[operation].Jobs.forEach(jobInfo => {
+                        jobNames.push(jobInfo.Name);
+                        jobRates.push(jobInfo.Cost);
                     });
                 }
                 else {
@@ -116,7 +131,7 @@
                 console.error(`Operation named "${operation}" not found in data.`);
             }
 
-            return { employees, jobNames };
+            return { employees, jobNames, jobRates };
         }
 
         function loadOptionToDropdown(sourceData, dropdownElementId) {
@@ -130,6 +145,17 @@
             });
         }
 
+
+        function calculateAmount() {
+            let amountElement = document.getElementById('operation');
+            if (selectedOperation && selectedJob && typeof noOfQuantity === 'number' && noOfQuantity > 0) {
+                amountElement.value = noOfQuantity * selectedJobRate;
+            }
+            else {
+                amountElement.value = 0;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             fetch(atob(api)).then(response => response.json()).then(data => {
                 masterData = data;
@@ -139,6 +165,10 @@
                 Object.freeze(operationNames);
                 Object.freeze(poNumbers);
 
+                const dateInput = document.getElementById('workdate');
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.value = today;
+
                 loadOptionToDropdown(operationNames, 'operation');
                 loadOptionToDropdown(poNumbers, 'ponumber');
             }).catch(error => {
@@ -147,14 +177,28 @@
         });
 
         document.getElementById('operation').addEventListener('change', function () {
-            var operation = this.value;
-            console.log({ operation });
-
-            const { employees, jobNames } = extractData(operation);
-            console.log({ employees }, { jobNames });
-
+            selectedOperation = this.value;
+            const { employees, jobNames, jobRates } = extractData(selectedOperation);
+            availableJobs = jobNames;
+            availableJobRates = jobRates;
             loadOptionToDropdown(jobNames, 'job');
             loadOptionToDropdown(employees, 'employee');
+            calculateAmount();
+        });
+
+        document.getElementById('job').addEventListener('change', function () {
+            selectedJob = this.value;
+            let indexOfJob = availableJobs.findIndex(x => x == selectedJob);
+            if (indexOfJob < 0) {
+                alert('Could not find the rate against the job seleceted');
+            }
+            selectedJobRate = availableJobRates[indexOfJob];
+            calculateAmount();
+        });
+
+        document.getElementById('quantity').addEventListener('change', function () {
+            noOfQuantity = this.value;
+            calculateAmount();
         });
 
         document.getElementById('dataForm').addEventListener('submit', function (event) {
