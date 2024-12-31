@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/garments-basic-repo/favicon.ico" type="image/x-icon">
 
     <title>Arun Garments Job Entry</title>
     <!-- TODO: Load Favicon -->
@@ -56,12 +56,6 @@
         </select>
         <br>
 
-        <label for="employee">Employee Name:</label>
-        <select id="employee" name="employee">
-            <option value="" disabled selected>Select Employee Name</option>
-        </select>
-        <br>
-
         <label for="operation">Operation:</label>
         <select id="operation" name="operation">
             <option value="" disabled selected>Select Operation</option>
@@ -74,13 +68,19 @@
         </select>
         <br>
 
+        <label for="employee">Employee Name:</label>
+        <select id="employee" name="employee">
+            <option value="" disabled selected>Select Employee Name</option>
+        </select>
+        <br>
+
         <label for="quantity">Number of pieces:</label>
         <input type="number" id="quantity" name="quantity" min="1" max="10000">
         <br>
 
         <!-- TODO: Show the cost multiply with cost -->
-        <label for="amount">Amount:</label>
-        <input type="number" disabled id="amount" name="amount">
+        <label for="amount">Amount in Rupees:</label>
+        <input type="number" id="amount" name="amount">
         <br>
 
         <button type="submit">Submit</button>
@@ -189,10 +189,12 @@
         document.getElementById('job').addEventListener('change', function () {
             selectedJob = this.value;
             let indexOfJob = availableJobs.findIndex(x => x == selectedJob);
+
             if (indexOfJob < 0) {
                 alert('Could not find the rate against the job seleceted');
             }
             selectedJobRate = availableJobRates[indexOfJob];
+            console.log({ availableJobs }, { availableJobRates }, { selectedJobRate });
             calculateAmount();
         });
 
