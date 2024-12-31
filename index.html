@@ -56,6 +56,13 @@
             background-color: #45a049;
         }
 
+        #loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px;
+        }
+
         @media (max-width: 600px) {
             form {
                 padding: 15px;
@@ -103,7 +110,7 @@
         <input type="number" disabled id="amount" name="amount" step="any" required>
 
         <button type="submit" id="submitBtn">Submit</button>
-        
+
         <div id="loader" style="visibility: hidden;">🔄 Loading...</div>
     </form>
     <script>
@@ -169,7 +176,7 @@
 
         function calculateAmount() {
             let amountElement = document.getElementById('amount');
-            if (selectedOperation && selectedJob && Number(noOfQuantity) > 0 && Number(selectedJobRate) > 0) {
+            if (selectedOperation.length > 0 && selectedJob.length > 0 && Number(noOfQuantity) > 0 && Number(selectedJobRate) > 0) {
                 amountElement.value = (Number(noOfQuantity) * Number(selectedJobRate)).toFixed(2);
             }
             else {
@@ -235,11 +242,7 @@
             document.getElementById('submitBtn').style.visibility = "hidden";
             document.getElementById('loader').style.visibility = "visible";
             var formData = new FormData(event.target);
-            fetch(atob(api), {
-                method: 'POST',
-                body: formData,
-                mode: 'no-cors'
-            }).then(response => response.text())
+            fetch(atob(api), { method: 'POST', body: formData, mode: 'no-cors' }).then(response => response.text())
                 .then(data => {
                     alert('The data has been added into your Google sheet.');
                     document.getElementById('dataForm').reset();
