@@ -159,15 +159,16 @@
 
         document.getElementById('dataForm').addEventListener('submit', function (event) {
             event.preventDefault();
-            console.log({ ...event });
+            var form = this;
             var formData = new FormData(event.target);
-            console.log({ ...formData });
             fetch(atob(api), {
                 method: 'POST',
                 body: formData
             }).then(response => response.text())
-                .then(data => alert(data))
-                .catch(error => console.error('Error:', error));
+                .then(data => {
+                    alert('The data has been added into your Google sheet.');
+                    form.reset();
+                }).catch(error => console.error('Error:', error));
         });
     </script>
 </body>
