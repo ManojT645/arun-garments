@@ -45,39 +45,39 @@
     <form id="dataForm">
 
         <label for="date">Select a date:</label>
-        <input type="date" id="workdate" name="workdate">
+        <input type="date" id="workdate" name="workdate" required>
         <br>
 
         <label for="ponumber">Purchase Order No:</label>
-        <select id="ponumber" name="ponumber">
+        <select id="ponumber" name="ponumber" required>
             <option value="" disabled selected>Select P.O No</option>
         </select>
         <br>
 
         <label for="operation">Operation:</label>
-        <select id="operation" name="operation">
+        <select id="operation" name="operation" required>
             <option value="" disabled selected>Select Operation</option>
         </select>
         <br>
 
         <label for="job">Job:</label>
-        <select id="job" name="job">
+        <select id="job" name="job" required>
             <option value="" disabled selected>Select Job</option>
         </select>
         <br>
 
         <label for="employee">Employee Name:</label>
-        <select id="employee" name="employee">
+        <select id="employee" name="employee" required>
             <option value="" disabled selected>Select Employee Name</option>
         </select>
         <br>
 
         <label for="quantity">Number of pieces:</label>
-        <input type="number" id="quantity" name="quantity" min="1" max="10000">
+        <input type="number" id="quantity" name="quantity" min="1" max="10000" required>
         <br>
 
         <label for="amount">Amount in Rupees:</label>
-        <input type="number" id="amount" name="amount" step="any">
+        <input type="number" disabled ="amount" name="amount" step="any" required>
         <br>
 
         <button type="submit" id="submitBtn">Submit</button>
@@ -205,7 +205,7 @@
 
         document.getElementById('dataForm').addEventListener('submit', function (event) {
             event.preventDefault();
-            const submitBtn = document.getElementById('submitBtn');
+            let submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
             var formData = new FormData(event.target);
             fetch(atob(api), {
@@ -214,10 +214,10 @@
                 mode: 'no-cors'
             }).then(response => response.text())
                 .then(data => {
-                    submitBtn.disabled = false;
                     alert('The data has been added into your Google sheet.');
                     document.getElementById('dataForm').reset();
                     setCurrentDate();
+                    submitBtn.disabled = false;
                 }).catch(error => console.error('Error:', error));
         });
     </script>
