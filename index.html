@@ -11,24 +11,41 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
         }
 
         form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             max-width: 400px;
-            margin: auto;
-        }
-
-        label,
-        input {
-            display: block;
             width: 100%;
-            margin-bottom: 10px;
         }
 
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input,
+        select,
         button {
             width: 100%;
             padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
             background-color: #4CAF50;
             color: white;
             border: none;
@@ -38,47 +55,52 @@
         button:hover {
             background-color: #45a049;
         }
+
+        @media (max-width: 600px) {
+            form {
+                padding: 15px;
+            }
+
+            label,
+            input,
+            select,
+            button {
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 
 <body>
     <form id="dataForm">
-
         <label for="date">Select a date:</label>
         <input type="date" id="workdate" name="workdate" required>
-        <br>
 
         <label for="ponumber">Purchase Order No:</label>
         <select id="ponumber" name="ponumber" required>
             <option value="" disabled selected>Select P.O No</option>
         </select>
-        <br>
 
         <label for="operation">Operation:</label>
         <select id="operation" name="operation" required>
             <option value="" disabled selected>Select Operation</option>
         </select>
-        <br>
 
         <label for="job">Job:</label>
         <select id="job" name="job" required>
             <option value="" disabled selected>Select Job</option>
         </select>
-        <br>
 
         <label for="employee">Employee Name:</label>
         <select id="employee" name="employee" required>
             <option value="" disabled selected>Select Employee Name</option>
         </select>
-        <br>
 
         <label for="quantity">Number of pieces:</label>
         <input type="number" id="quantity" name="quantity" min="1" max="10000" required>
-        <br>
 
         <label for="amount">Amount in Rupees:</label>
-        <input type="number" disabled ="amount" name="amount" step="any" required>
-        <br>
+        <input type="number" disabled id="amount" name="amount" step="any" required>
 
         <button type="submit" id="submitBtn">Submit</button>
     </form>
@@ -153,10 +175,10 @@
             }
         }
 
-        function setCurrentDate(){
+        function setCurrentDate() {
             const dateInput = document.getElementById('workdate');
-                const today = new Date().toISOString().split('T')[0];
-                dateInput.value = today;
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
         }
 
         document.addEventListener('DOMContentLoaded', function () {
