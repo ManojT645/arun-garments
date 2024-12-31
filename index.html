@@ -107,11 +107,11 @@
         <input type="number" id="quantity" name="quantity" min="1" max="10000" required>
 
         <label for="amount">Amount in Rupees:</label>
-        <input type="number" disabled id="amount" name="amount" step="any" required>
+        <input type="number" id="amount" name="amount" step="any" readonly required>
 
         <button type="submit" id="submitBtn">Submit</button>
 
-        <div id="loader" style="display: none;">🔄 Loading...</div>
+        <div id="loader" style="display: none;">🔄 Saving your changes...</div>
     </form>
     <script>
         var masterData = {}; // readonly - Response from API
@@ -121,6 +121,7 @@
         var availableJobs = [];
         var availableJobRates = [];
 
+        //#region Functions
         function clearDropdown(dropdownElement) {
             // Remove all child elements except the first one
             while (dropdownElement.children.length > 1) {
@@ -168,7 +169,6 @@
             });
         }
 
-
         function calculateAmount() {
             let amountElement = document.getElementById('amount');
             let selectedOperation = document.getElementById('operation').value;
@@ -199,7 +199,9 @@
                 document.getElementById('submitBtn').style.display = "block";
             }
         }
+        //#endregion
 
+        //#region Event listeners
         document.addEventListener('DOMContentLoaded', function () {
             fetch(atob(api)).then(response => response.json()).then(data => {
                 masterData = data;
@@ -254,6 +256,7 @@
                     alert('The data has been added into your Google sheet.');
                 }).catch(error => console.error('Error:', error));
         });
+        //#endregion
     </script>
 </body>
 
