@@ -80,7 +80,7 @@
         <input type="number" id="amount" name="amount" step="any">
         <br>
 
-        <button type="submit">Submit</button>
+        <button type="submit" id="submitBtn">Submit</button>
     </form>
     <script>
         var masterData = {}; // readonly - Response from API
@@ -205,6 +205,8 @@
 
         document.getElementById('dataForm').addEventListener('submit', function (event) {
             event.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
             var formData = new FormData(event.target);
             fetch(atob(api), {
                 method: 'POST',
@@ -212,6 +214,7 @@
                 mode: 'no-cors'
             }).then(response => response.text())
                 .then(data => {
+                    submitBtn.disabled = false;
                     alert('The data has been added into your Google sheet.');
                     document.getElementById('dataForm').reset();
                     setCurrentDate();
