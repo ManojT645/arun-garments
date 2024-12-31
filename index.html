@@ -103,6 +103,8 @@
         <input type="number" disabled id="amount" name="amount" step="any" required>
 
         <button type="submit" id="submitBtn">Submit</button>
+        
+        <div id="loader" style="visibility: hidden;">🔄 Loading...</div>
     </form>
     <script>
         var masterData = {}; // readonly - Response from API
@@ -230,7 +232,8 @@
         document.getElementById('dataForm').addEventListener('submit', function (event) {
             event.preventDefault();
             let submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
+            document.getElementById('submitBtn').style.visibility = "hidden";
+            document.getElementById('loader').style.visibility = "visible";
             var formData = new FormData(event.target);
             fetch(atob(api), {
                 method: 'POST',
@@ -241,7 +244,8 @@
                     alert('The data has been added into your Google sheet.');
                     document.getElementById('dataForm').reset();
                     setCurrentDate();
-                    submitBtn.disabled = false;
+                    document.getElementById('loader').style.visibility = "hidden";
+                    document.getElementById('submitBtn').style.visibility = "visible";
                 }).catch(error => console.error('Error:', error));
         });
     </script>
