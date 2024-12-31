@@ -145,8 +145,8 @@
 
         function calculateAmount() {
             let amountElement = document.getElementById('amount');
-            if (selectedOperation && selectedJob && Number(noOfQuantity) > 0) {
-                amountElement.value = (Number(noOfQuantity) * selectedJobRate).toFixed(2);
+            if (selectedOperation && selectedJob && Number(noOfQuantity) > 0 && Number(selectedJobRate) > 0) {
+                amountElement.value = (Number(noOfQuantity) * Number(selectedJobRate)).toFixed(2);
             }
             else {
                 amountElement.value = 0;
@@ -170,7 +170,6 @@
 
                 loadOptionToDropdown(operationNames, 'operation');
                 loadOptionToDropdown(poNumbers, 'ponumber');
-
                 setCurrentDate();
             }).catch(error => {
                 console.error('Error:', error);
@@ -182,6 +181,9 @@
             const { employees, jobNames, jobRates } = extractData(selectedOperation);
             availableJobs = jobNames;
             availableJobRates = jobRates;
+            document.getElementById('job').selectedIndex = 0;
+            document.getElementById('employee').selectedIndex = 0;
+
             loadOptionToDropdown(jobNames, 'job');
             loadOptionToDropdown(employees, 'employee');
             calculateAmount();
