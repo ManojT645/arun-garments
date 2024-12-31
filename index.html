@@ -147,7 +147,7 @@
 
 
         function calculateAmount() {
-            let amountElement = document.getElementById('operation');
+            let amountElement = document.getElementById('amount');
             if (selectedOperation && selectedJob && typeof noOfQuantity === 'number' && noOfQuantity > 0) {
                 amountElement.value = noOfQuantity * selectedJobRate;
             }
