@@ -162,7 +162,8 @@
             var formData = new FormData(event.target);
             fetch(atob(api), {
                 method: 'POST',
-                body: formData
+                body: formData,
+                mode: 'no-cors'
             }).then(response => response.text())
                 .then(data => {
                     alert('The data has been added into your Google sheet.');
