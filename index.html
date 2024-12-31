@@ -42,14 +42,6 @@
 
 <body>
     <form id="dataForm">
-        <!-- <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
-        <br>
-        
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <br> -->
-
         <label for="operation">Operation:</label>
         <select id="operation" name="operation">
             <option value="" disabled selected>Select Operation</option>
@@ -91,9 +83,8 @@
         var masterData = {}; // readonly - Response from API
         var operationNames = []; // readonly - String array that contains only operation names 
         var poNumbers = []; // readonly - String array that contains only purchase order numbers
-        // var api = 'https://script.google.com/macros/s/AKfycbySyu0tvHg4vSr_4anegloAQHnHYu3rLfx2rzquT0nQOYyB0bCRI9xyuwy7N-1c-3JJsQ/exec'
-        var api = secrets.APPSCRIPTENDPOINT;
-        console.log({api});
+        var api = 'https://script.google.com/macros/s/AKfycbyM6mgI8-5Fppb_4r2KeBH4o8rBJ2X0X4PA2Sy_dxEYuSayRIR-GxMHi-gpPIaarqu1Pg/exec'
+        
         function clearDropdown(dropdownElement) {
             // Remove all child elements except the first one
             while (dropdownElement.children.length > 1) {
