@@ -120,11 +120,6 @@
         var api = 'aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J4S0NBMTl2SHlGQ0NxNGN1S2dtVktuV2Z1N1lYVFNZYTdLdGxMRkF5Qk9ERURpS1ZRaGdrdVpFaGtJckxiRlI5dlI1US9leGVj';
         var availableJobs = [];
         var availableJobRates = [];
-        var selectedOperation = '';
-        var selectedJob = '';
-        var selectedJobRate = 0;
-        var noOfQuantity = 0;
-
 
         function clearDropdown(dropdownElement) {
             // Remove all child elements except the first one
@@ -176,6 +171,11 @@
 
         function calculateAmount() {
             let amountElement = document.getElementById('amount');
+            let selectedOperation = document.getElementById('operation').value;
+            let selectedJob = document.getElementById('job').value;
+            let noOfQuantity = document.getElementById('quantity').value;
+            let selectedJobRate = availableJobRates[availableJobs.findIndex(x => x == selectedJob)];
+
             if (selectedOperation.length > 0 && selectedJob.length > 0 && Number(noOfQuantity) > 0 && Number(selectedJobRate) > 0) {
                 amountElement.value = (Number(noOfQuantity) * Number(selectedJobRate)).toFixed(2);
             }
@@ -208,8 +208,7 @@
         });
 
         document.getElementById('operation').addEventListener('change', function () {
-            selectedOperation = this.value;
-            const { employees, jobNames, jobRates } = extractData(selectedOperation);
+            const { employees, jobNames, jobRates } = extractData(this.value);
             availableJobs = jobNames;
             availableJobRates = jobRates;
             document.getElementById('job').selectedIndex = 0;
@@ -221,18 +220,15 @@
         });
 
         document.getElementById('job').addEventListener('change', function () {
-            selectedJob = this.value;
-            let indexOfJob = availableJobs.findIndex(x => x == selectedJob);
+            let indexOfJob = availableJobs.findIndex(x => x == this.value);
 
             if (indexOfJob < 0) {
                 alert('Could not find the rate against the job seleceted');
             }
-            selectedJobRate = availableJobRates[indexOfJob];
             calculateAmount();
         });
 
-        document.getElementById('quantity').addEventListener('change', function () {
-            noOfQuantity = this.value;
+        document.getElementById('quantity').addEventListener('input', function () {
             calculateAmount();
         });
 
