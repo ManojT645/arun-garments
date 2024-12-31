@@ -84,7 +84,7 @@
         var operationNames = []; // readonly - String array that contains only operation names 
         var poNumbers = []; // readonly - String array that contains only purchase order numbers
         var api = 'https://script.google.com/macros/s/AKfycbyM6mgI8-5Fppb_4r2KeBH4o8rBJ2X0X4PA2Sy_dxEYuSayRIR-GxMHi-gpPIaarqu1Pg/exec'
-        
+
         function clearDropdown(dropdownElement) {
             // Remove all child elements except the first one
             while (dropdownElement.children.length > 1) {
@@ -131,7 +131,9 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            fetch(api).then(response => response.json()).then(data => {
+            fetch(api, {
+                mode: "no-cors",
+            }).then(response => response.json()).then(data => {
                 masterData = data;
                 operationNames = Object.keys(data.Operations);
                 poNumbers = data.PONumbers;
@@ -142,8 +144,8 @@
                 loadOptionToDropdown(operationNames, 'operation');
                 loadOptionToDropdown(poNumbers, 'ponumber');
             }).catch(error => {
-                    console.error('Error:', error);
-                });
+                console.error('Error:', error);
+            });
         });
 
         document.getElementById('operation').addEventListener('change', function () {
@@ -164,7 +166,8 @@
             console.log({ ...formData });
             fetch(api, {
                 method: 'POST',
-                body: formData
+                body: formData,
+                mode: "no-cors"
             }).then(response => response.text())
                 .then(data => alert(data))
                 .catch(error => console.error('Error:', error));
