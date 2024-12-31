@@ -159,7 +159,6 @@
 
         document.getElementById('dataForm').addEventListener('submit', function (event) {
             event.preventDefault();
-            var form = this;
             var formData = new FormData(event.target);
             fetch(atob(api), {
                 method: 'POST',
@@ -167,7 +166,7 @@
             }).then(response => response.text())
                 .then(data => {
                     alert('The data has been added into your Google sheet.');
-                    form.reset();
+                    document.getElementById('dataForm').reset();
                 }).catch(error => console.error('Error:', error));
         });
     </script>
