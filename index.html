@@ -190,6 +190,16 @@
             dateInput.value = today;
         }
 
+        function toggleSubmitAndLoader(submitStarted) {
+            if (submitStarted == true) {
+                document.getElementById('submitBtn').style.display = "none";
+                document.getElementById('loader').style.display = "flex";
+            } else {
+                document.getElementById('loader').style.display = "none";
+                document.getElementById('submitBtn').style.display = "block";
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             fetch(atob(api)).then(response => response.json()).then(data => {
                 masterData = data;
@@ -234,17 +244,19 @@
 
         document.getElementById('dataForm').addEventListener('submit', function (event) {
             event.preventDefault();
-            let submitBtn = document.getElementById('submitBtn');
-            document.getElementById('submitBtn').style.visibility = "hidden";
-            document.getElementById('loader').style.visibility = "visible";
+            toggleSubmitAndLoader(true);
+            // let submitBtn = document.getElementById('submitBtn');
+            // document.getElementById('submitBtn').style.visibility = "hidden";
+            // document.getElementById('loader').style.visibility = "visible";
             var formData = new FormData(event.target);
             fetch(atob(api), { method: 'POST', body: formData, mode: 'no-cors' }).then(response => response.text())
                 .then(data => {
-                    alert('The data has been added into your Google sheet.');
                     document.getElementById('dataForm').reset();
                     setCurrentDate();
-                    document.getElementById('loader').style.visibility = "hidden";
-                    document.getElementById('submitBtn').style.visibility = "visible";
+                    toggleSubmitAndLoader(false);
+                    // document.getElementById('loader').style.visibility = "hidden";
+                    // document.getElementById('submitBtn').style.visibility = "visible";
+                    alert('The data has been added into your Google sheet.');
                 }).catch(error => console.error('Error:', error));
         });
     </script>
