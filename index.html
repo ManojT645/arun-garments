@@ -83,7 +83,7 @@
         var masterData = {}; // readonly - Response from API
         var operationNames = []; // readonly - String array that contains only operation names 
         var poNumbers = []; // readonly - String array that contains only purchase order numbers
-        var api = 'https://script.google.com/macros/s/AKfycby56ffE0Zf8fogFM4KeNecKJAPwa_5l0llj2VgkIiI2Xj4XfONN27dmAHcpF2aKHJnxJg/exec'
+        var api = 'aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J5NTZmZkUwWmY4Zm9nRk00S2VOZWNLSkFQd2FfNWwwbGxqMlZna0lpSTJYajRYZk9OTjI3ZG1BSGNwRjJhS0hKbnhKZy9leGVj'
 
         function clearDropdown(dropdownElement) {
             // Remove all child elements except the first one
@@ -131,7 +131,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            fetch(api).then(response => response.json()).then(data => {
+            fetch(atob(api)).then(response => response.json()).then(data => {
                 masterData = data;
                 operationNames = Object.keys(data.Operations);
                 poNumbers = data.PONumbers;
@@ -162,7 +162,7 @@
             console.log({ ...event });
             var formData = new FormData(event.target);
             console.log({ ...formData });
-            fetch(api, {
+            fetch(atob(api), {
                 method: 'POST',
                 body: formData
             }).then(response => response.text())
