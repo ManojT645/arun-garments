@@ -79,49 +79,124 @@
 </head>
 
 <body>
-    <form id="dataForm">
+    <form id="dataFormId">
         <label for="date">Select a date:</label>
-        <input type="date" id="workdate" name="workdate" required>
+        <input type="date" id="workdateId" name="workdate" required>
 
         <label for="ponumber">Purchase Order No:</label>
-        <select id="ponumber" name="ponumber" required>
+        <select id="ponumberId" name="ponumber" required>
             <option value="" disabled selected>Select P.O No</option>
         </select>
 
-        <label for="operation">Operation:</label>
-        <select id="operation" name="operation" required>
+        <label for="style">Style:</label>
+        <select id="style" name="style" required>
+            <!-- TODO: disable this placeholder and make it select the first item -->
+            <option value="" disabled selected>Select Style</option>
+        </select>
+
+        <label for="operation">Job:</label>
+        <select id="operationId" name="operation" required>
             <option value="" disabled selected>Select Operation</option>
         </select>
 
-        <label for="job">Job:</label>
-        <select id="job" name="job" required>
+        <label for="job">Operation:</label>
+        <select id="jobId" name="job" required>
             <option value="" disabled selected>Select Job</option>
         </select>
 
         <label for="employee">Employee Name:</label>
-        <select id="employee" name="employee" required>
+        <select id="employeeId" name="employee" required>
             <option value="" disabled selected>Select Employee Name</option>
         </select>
 
         <label for="quantity">Number of pieces:</label>
-        <input type="number" id="quantity" name="quantity" min="1" max="10000" required>
+        <input type="number" id="quantityId" name="quantity" min="1" max="10000" required>
 
         <label for="amount">Amount in Rupees:</label>
-        <input type="number" id="amount" name="amount" step="any" readonly required>
+        <input type="number" id="amountId" name="amount" step="any" readonly required>
+        <label for="style">Style:</label>
 
-        <button type="submit" id="submitBtn">Submit</button>
+        <label for="color">Color:</label>
+        <select id="colorId" name="color" required>
+            <option value="" disabled selected>Select Color</option>
+        </select>
 
-        <div id="loader" style="display: none;">🔄 Saving your changes...</div>
+        <button type="submit" id="submitButtonId">Submit</button>
+        <div id="loaderId" style="display: none;">🔄 Saving your changes...</div>
     </form>
     <script>
-        var masterData = {}; // readonly - Response from API
-        var operationNames = []; // readonly - String array that contains only operation names 
-        var poNumbers = []; // readonly - String array that contains only purchase order numbers
-        var api = 'aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J4S0NBMTl2SHlGQ0NxNGN1S2dtVktuV2Z1N1lYVFNZYTdLdGxMRkF5Qk9ERURpS1ZRaGdrdVpFaGtJckxiRlI5dlI1US9leGVj';
+        var sourceMasterData = {}; // readonly - Response from API
+        var sourceOperationNames = []; // readonly - String array that contains only operation names 
+        var sourcePONumbers = []; // readonly - String array that contains only purchase order numbers
+        var sourceStyles = []; // readonly - String array that contains only styles
+        var sourceColors = []; // readonly - String array that contains only colors
+        var api = 'aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J4SnAtanpJQTA1WGdqZExrSE9uU1dJOHMzeTdzN2JKelJRUk5xdElSUnRpY2VnWnBTZ2pBbm1QNHRfRjF0TkVfdUlLQS9leGVj';
         var availableJobs = [];
         var availableJobRates = [];
 
+        //#region Elements by Id
+        function elementOfForm() {
+            return document.getElementById('dataFormId')
+        }
+
+        function elementOfOperation() {
+            return document.getElementById('operationId')
+        }
+
+        function elementOfPONumber() {
+            return document.getElementById('ponumberId')
+        }
+
+        function elementOfColor() {
+            return document.getElementById('colorId')
+        }
+
+        function elementOfStyle() {
+            return document.getElementById('styleId')
+        }
+
+        function elementOfWorkDate() {
+            return document.getElementById('workdateId')
+        }
+
+        function elementOfJob() {
+            return document.getElementById('jobId')
+        }
+
+        function elementOfEmployee() {
+            return document.getElementById('employeeId')
+        }
+
+        function elementOfQuantity() {
+            return document.getElementById('quantityId')
+        }
+
+        function elementOfAmount() {
+            return document.getElementById('amountId')
+        }
+
+        function elementOfSubmitButton() {
+            return document.getElementById('submitButtonId')
+        }
+
+        function elementOfLoader() {
+            return document.getElementById('loaderId')
+        }
+        //#endregion
+
         //#region Functions
+
+        //#region Page init functions
+        function loadOptionToDropdown(sourceData, dropdownElement) {
+            clearDropdown(dropdownElement);
+            sourceData.forEach(optionData => {
+                const option = document.createElement('option');
+                option.value = optionData;
+                option.textContent = optionData;
+                dropdownElement.appendChild(option);
+            });
+        }
+
         function clearDropdown(dropdownElement) {
             // Remove all child elements except the first one
             while (dropdownElement.children.length > 1) {
@@ -129,21 +204,39 @@
             }
         }
 
+        function extractUniqueStyles(operations) {
+            const uniqueStyles = new Set();
+            for (const key in operations) {
+                if (operations[key].Jobs) {
+                    const jobs = operations[key].Jobs;
+                    jobs.forEach(job => uniqueStyles.add(job.Style));
+                }
+            }
+            return Array.from(uniqueStyles);
+        }
+
+        function setCurrentDate() {
+            const dateInput = elementOfWorkDate();
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
+        }
+        //#endregion
+
         function extractData(operation) {
             const employees = [];
             const jobNames = [];
             const jobRates = []; // rate store against each jobName index position
 
-            if (masterData.Operations[operation]) {
-                if (masterData.Operations[operation].Employees) {
-                    employees.push(...masterData.Operations[operation].Employees);
+            if (sourceMasterData.Operations[operation]) {
+                if (sourceMasterData.Operations[operation].Employees) {
+                    employees.push(...sourceMasterData.Operations[operation].Employees);
                 }
                 else {
                     console.error(`Employees object of "${operation}" Operation is not found in data.`);
                 }
                 // Extract operation names
-                if (masterData.Operations[operation].Jobs) {
-                    masterData.Operations[operation].Jobs.forEach(jobInfo => {
+                if (sourceMasterData.Operations[operation].Jobs) {
+                    sourceMasterData.Operations[operation].Jobs.forEach(jobInfo => {
                         jobNames.push(jobInfo.Name);
                         jobRates.push(jobInfo.Cost);
                     });
@@ -158,22 +251,11 @@
             return { employees, jobNames, jobRates };
         }
 
-        function loadOptionToDropdown(sourceData, dropdownElementId) {
-            const dropdownElement = document.getElementById(dropdownElementId);
-            clearDropdown(dropdownElement);
-            sourceData.forEach(optionData => {
-                const option = document.createElement('option');
-                option.value = optionData;
-                option.textContent = optionData;
-                dropdownElement.appendChild(option);
-            });
-        }
-
         function calculateAmount() {
-            let amountElement = document.getElementById('amount');
-            let selectedOperation = document.getElementById('operation').value;
-            let selectedJob = document.getElementById('job').value;
-            let noOfQuantity = document.getElementById('quantity').value;
+            let amountElement = elementOfAmount();
+            let selectedOperation = elementOfOperation().value;
+            let selectedJob = elementOfJob().value;
+            let noOfQuantity = elementOfQuantity().value;
             let selectedJobRate = availableJobRates[availableJobs.findIndex(x => x == selectedJob)];
 
             if (selectedOperation.length > 0 && selectedJob.length > 0 && Number(noOfQuantity) > 0 && Number(selectedJobRate) > 0) {
@@ -184,19 +266,13 @@
             }
         }
 
-        function setCurrentDate() {
-            const dateInput = document.getElementById('workdate');
-            const today = new Date().toISOString().split('T')[0];
-            dateInput.value = today;
-        }
-
         function toggleSubmitAndLoader(submitStarted) {
             if (submitStarted == true) {
-                document.getElementById('submitBtn').style.display = "none";
-                document.getElementById('loader').style.display = "flex";
+                elementOfSubmitButton().style.display = "none";
+                elementOfLoader().style.display = "flex";
             } else {
-                document.getElementById('loader').style.display = "none";
-                document.getElementById('submitBtn').style.display = "block";
+                elementOfLoader().style.display = "none";
+                elementOfSubmitButton().style.display = "block";
             }
         }
         //#endregion
@@ -204,34 +280,41 @@
         //#region Event listeners
         document.addEventListener('DOMContentLoaded', function () {
             fetch(atob(api)).then(response => response.json()).then(data => {
-                masterData = data;
-                operationNames = Object.keys(data.Operations);
-                poNumbers = data.PONumbers;
-                Object.freeze(masterData);
-                Object.freeze(operationNames);
-                Object.freeze(poNumbers);
+                sourceMasterData = data;
+                sourceOperationNames = Object.keys(data.Operations);
+                sourcePONumbers = data.PONumbers;
+                sourceColors = data.Colors;
+                sourceStyles = extractUniqueStyles(JSON.parse(data.Operations));
 
-                loadOptionToDropdown(operationNames, 'operation');
-                loadOptionToDropdown(poNumbers, 'ponumber');
+                Object.freeze(sourceMasterData);
+                Object.freeze(sourceOperationNames);
+                Object.freeze(sourcePONumbers);
+                Object.freeze(sourceColors);
+                Object.freeze(sourceStyles);
+
+                loadOptionToDropdown(sourceOperationNames, elementOfOperation());
+                loadOptionToDropdown(sourcePONumbers, elementOfPONumber());
+                loadOptionToDropdown(sourceColors, elementOfColor());
+                loadOptionToDropdown(sourceStyles, elementOfStyle());
                 setCurrentDate();
             }).catch(error => {
                 console.error('Error:', error);
             });
         });
 
-        document.getElementById('operation').addEventListener('change', function () {
+        elementOfOperation().addEventListener('change', function () {
             const { employees, jobNames, jobRates } = extractData(this.value);
             availableJobs = jobNames;
             availableJobRates = jobRates;
-            document.getElementById('job').selectedIndex = 0;
-            document.getElementById('employee').selectedIndex = 0;
+            elementOfJob().selectedIndex = 0;
+            elementOfEmployee().selectedIndex = 0;
 
-            loadOptionToDropdown(jobNames, 'job');
-            loadOptionToDropdown(employees, 'employee');
+            loadOptionToDropdown(jobNames, elementOfJob());
+            loadOptionToDropdown(employees, elementOfEmployee());
             calculateAmount();
         });
 
-        document.getElementById('job').addEventListener('change', function () {
+        elementOfJob().addEventListener('change', function () {
             let indexOfJob = availableJobs.findIndex(x => x == this.value);
 
             if (indexOfJob < 0) {
@@ -240,17 +323,17 @@
             calculateAmount();
         });
 
-        document.getElementById('quantity').addEventListener('input', function () {
+        elementOfQuantity().addEventListener('input', function () {
             calculateAmount();
         });
 
-        document.getElementById('dataForm').addEventListener('submit', function (event) {
+        elementOfForm().addEventListener('submit', function (event) {
             event.preventDefault();
             toggleSubmitAndLoader(true);
             var formData = new FormData(event.target);
             fetch(atob(api), { method: 'POST', body: formData, mode: 'no-cors' }).then(response => response.text())
                 .then(data => {
-                    document.getElementById('dataForm').reset();
+                    elementOfForm().reset();
                     setCurrentDate();
                     toggleSubmitAndLoader(false);
                     alert('The data has been added into your Google sheet.');
