@@ -236,9 +236,11 @@
                     console.error(`Employees object of "${operation}" Operation is not found in data.`);
                 }
                 const styleName = elementOfStyle().value;
+                console.log({ styleName });
+                const jobsCollection = sourceMasterData.Operations[operation].Jobs.filter(x => x.style == styleName);
                 // Extract job names
-                if (sourceMasterData.Operations[operation].Jobs.some(x => x.style == styleName)) {
-                    sourceMasterData.Operations[operation].Jobs.filter(x => x.style == styleName).forEach(jobInfo => {
+                if (jobsCollection.length > 0) {
+                    jobsCollection.forEach(jobInfo => {
                         jobNames.push(jobInfo.Name);
                         jobRates.push(jobInfo.Cost);
                     });
@@ -310,7 +312,7 @@
             const { employees, jobNames, jobRates } = extractData(this.value);
             availableJobs = jobNames;
             availableJobRates = jobRates;
-            
+
             loadOptionToDropdown(jobNames, elementOfJob(), 0);
             loadOptionToDropdown(employees, elementOfEmployee(), 0);
             calculateAmount();
