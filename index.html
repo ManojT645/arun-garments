@@ -287,7 +287,7 @@
                 sourcePONumbers = data.PONumbers;
                 sourceColors = data.Colors;
                 sourceStyles = extractUniqueStyles(data.Operations);
-                
+
                 Object.freeze(sourceMasterData);
                 Object.freeze(sourceOperationNames);
                 Object.freeze(sourcePONumbers);
@@ -295,6 +295,8 @@
                 Object.freeze(sourceStyles);
 
                 loadOptionToDropdown(sourceOperationNames, elementOfOperation(), 0);
+                const changeEvent = new Event('change');
+                elementOfOperation().dispatchEvent(changeEvent);
                 loadOptionToDropdown(sourcePONumbers, elementOfPONumber(), 0);
                 loadOptionToDropdown(sourceColors, elementOfColor(), 0);
                 loadOptionToDropdown(sourceStyles, elementOfStyle(), 0);
