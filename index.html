@@ -256,7 +256,6 @@
                 console.error(`Operation named "${operation}" not found in data.`);
             }
             const { jobNames, jobRates } = extractJobs(elementOfStyle().value, operation);
-            console.log({ jobNames }, { jobRates });
             return { employees, jobNames, jobRates };
         }
 
