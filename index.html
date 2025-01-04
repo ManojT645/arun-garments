@@ -90,8 +90,6 @@
 
         <label for="style">Style:</label>
         <select id="styleId" name="style" required>
-            <!-- TODO: disable this placeholder and make it select the first item -->
-            <!-- <option value="" disabled selected>Select Style</option> -->
         </select>
 
         <label for="operation">Job:</label>
@@ -296,12 +294,12 @@
                 Object.freeze(sourceColors);
                 Object.freeze(sourceStyles);
 
+                loadOptionToDropdown(sourceStyles, elementOfStyle(), 0);
                 loadOptionToDropdown(sourceOperationNames, elementOfOperation(), 0);
                 const changeEvent = new Event('change');
                 elementOfOperation().dispatchEvent(changeEvent);
                 loadOptionToDropdown(sourcePONumbers, elementOfPONumber(), 0);
                 loadOptionToDropdown(sourceColors, elementOfColor(), 0);
-                loadOptionToDropdown(sourceStyles, elementOfStyle(), 0);
                 setCurrentDate();
             }).catch(error => {
                 console.error('Error:', error);
