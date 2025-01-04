@@ -284,7 +284,7 @@
                 sourceOperationNames = Object.keys(data.Operations);
                 sourcePONumbers = data.PONumbers;
                 sourceColors = data.Colors;
-                sourceStyles = extractUniqueStyles(JSON.parse(data.Operations));
+                sourceStyles = extractUniqueStyles(data.Operations);
 
                 Object.freeze(sourceMasterData);
                 Object.freeze(sourceOperationNames);
