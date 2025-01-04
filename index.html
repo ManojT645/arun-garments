@@ -221,10 +221,23 @@
         }
         //#endregion
 
+        function extractJobs(styleName) {
+            const jobsCollection = sourceMasterData.Operations[operation].Jobs.filter(x => x.Style == styleName);
+            // Extract job names
+            if (jobsCollection.length > 0) {
+                jobsCollection.forEach(jobInfo => {
+                    jobNames.push(jobInfo.Name);
+                    jobRates.push(jobInfo.Cost);
+                });
+            }
+            else {
+                console.error(`Jobs object of "${operation}" Operation is not found in data.`);
+            }
+            return jobsCollection;
+        }
+
         function extractData(operation) {
             const employees = [];
-            const jobNames = [];
-            const jobRates = []; // rate store against each jobName index position
 
             if (sourceMasterData.Operations[operation]) {
                 if (sourceMasterData.Operations[operation].Employees) {
@@ -233,24 +246,11 @@
                 else {
                     console.error(`Employees object of "${operation}" Operation is not found in data.`);
                 }
-                const styleName = elementOfStyle().value;
-                console.log({ styleName });
-                const jobsCollection = sourceMasterData.Operations[operation].Jobs.filter(x => x.Style == styleName);
-                console.log({jobsCollection});
-                // Extract job names
-                if (jobsCollection.length > 0) {
-                    jobsCollection.forEach(jobInfo => {
-                        jobNames.push(jobInfo.Name);
-                        jobRates.push(jobInfo.Cost);
-                    });
-                }
-                else {
-                    console.error(`Jobs object of "${operation}" Operation is not found in data.`);
-                }
+
             } else {
                 console.error(`Operation named "${operation}" not found in data.`);
             }
-
+            const { jobNames, jobRates } = extractJobs(elementOfStyle().value);
             return { employees, jobNames, jobRates };
         }
 
@@ -314,6 +314,15 @@
 
             loadOptionToDropdown(jobNames, elementOfJob(), 0);
             loadOptionToDropdown(employees, elementOfEmployee(), 0);
+            calculateAmount();
+        });
+
+        elementOfStyle().addEventListener('change', function () {
+            const { jobNames, jobRates } = extractJobs(this.value);
+            availableJobs = jobNames;
+            availableJobRates = jobRates;
+
+            loadOptionToDropdown(jobNames, elementOfJob(), 0);
             calculateAmount();
         });
 
