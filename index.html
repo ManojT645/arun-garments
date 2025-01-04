@@ -114,31 +114,45 @@
                 font-size: 16px;
             }
         }
+
         table {
             width: 50%;
             border-collapse: collapse;
             margin: 20px 0;
         }
-        table, th, td {
+
+        table,
+        th,
+        td {
             border: 1px solid black;
         }
-        th, td {
+
+        th,
+        td {
             padding: 8px;
             text-align: left;
         }
+
         th {
             background-color: #f2f2f2;
         }
+
         .table-container {
-            max-height: 300px; /* Adjust the height as needed */
+            max-height: 300px;
+            /* Adjust the height as needed */
             overflow-y: auto;
+        }
+
+        .company-title {
+            padding-top: 20px;
+            color: green;
         }
     </style>
 </head>
 
 <body>
-    <title>Arun Garments Job Entry</title>
     <div class="container">
+        <h1 class="company-title">Arun Garments Job Entry</h1>
         <div class="tabs">
             <div class="tab active" data-tab="tab1">Form</div>
             <div class="tab" data-tab="tab2">Configuration</div>
