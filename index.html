@@ -235,7 +235,8 @@
                 }
                 const styleName = elementOfStyle().value;
                 console.log({ styleName });
-                const jobsCollection = sourceMasterData.Operations[operation].Jobs.filter(x => x.style == styleName);
+                const jobsCollection = sourceMasterData.Operations[operation].Jobs.filter(x => x.Style == styleName);
+                console.log({jobsCollection});
                 // Extract job names
                 if (jobsCollection.length > 0) {
                     jobsCollection.forEach(jobInfo => {
