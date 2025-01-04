@@ -222,6 +222,8 @@
         //#endregion
 
         function extractJobs(styleName, operation = null) {
+            let jobNames = []
+            let jobRates = []
             if (!operation) {
                 operation = elementOfOperation().value;
             }
