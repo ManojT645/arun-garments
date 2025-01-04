@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="/garments-basic-repo/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/arun-garments/favicon.ico" type="image/x-icon">
 
     <title>Arun Garments Job Entry</title>
     <style>
@@ -287,7 +287,7 @@
                 sourcePONumbers = data.PONumbers;
                 sourceColors = data.Colors;
                 sourceStyles = extractUniqueStyles(data.Operations);
-                console.log({ sourceStyles });
+                
                 Object.freeze(sourceMasterData);
                 Object.freeze(sourceOperationNames);
                 Object.freeze(sourcePONumbers);
@@ -305,14 +305,15 @@
         });
 
         elementOfOperation().addEventListener('change', function () {
+            console.log('operationChange event triggers');
             const { employees, jobNames, jobRates } = extractData(this.value);
             availableJobs = jobNames;
             availableJobRates = jobRates;
-            elementOfJob().selectedIndex = 0;
-            elementOfEmployee().selectedIndex = 0;
+            // elementOfJob().selectedIndex = 0;
+            // elementOfEmployee().selectedIndex = 0;
 
-            loadOptionToDropdown(jobNames, elementOfJob(), -1);
-            loadOptionToDropdown(employees, elementOfEmployee(), -1);
+            loadOptionToDropdown(jobNames, elementOfJob(), 0);
+            loadOptionToDropdown(employees, elementOfEmployee(), 0);
             calculateAmount();
         });
 
