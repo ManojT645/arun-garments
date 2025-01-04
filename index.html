@@ -85,23 +85,23 @@
 
         <label for="ponumber">Purchase Order No:</label>
         <select id="ponumberId" name="ponumber" required>
-            <option value="" disabled selected>Select P.O No</option>
+            <!-- <option value="" disabled selected>Select P.O No</option> -->
         </select>
 
         <label for="style">Style:</label>
-        <select id="style" name="style" required>
+        <select id="styleId" name="style" required>
             <!-- TODO: disable this placeholder and make it select the first item -->
-            <option value="" disabled selected>Select Style</option>
+            <!-- <option value="" disabled selected>Select Style</option> -->
         </select>
 
         <label for="operation">Job:</label>
         <select id="operationId" name="operation" required>
-            <option value="" disabled selected>Select Operation</option>
+            <!-- <option value="" disabled selected>Select Job</option> -->
         </select>
 
         <label for="job">Operation:</label>
         <select id="jobId" name="job" required>
-            <option value="" disabled selected>Select Job</option>
+            <!-- <option value="" disabled selected>Select Operation</option> -->
         </select>
 
         <label for="employee">Employee Name:</label>
@@ -114,11 +114,10 @@
 
         <label for="amount">Amount in Rupees:</label>
         <input type="number" id="amountId" name="amount" step="any" readonly required>
-        <label for="style">Style:</label>
 
         <label for="color">Color:</label>
         <select id="colorId" name="color" required>
-            <option value="" disabled selected>Select Color</option>
+            <!-- <option value="" disabled selected>Select Color</option> -->
         </select>
 
         <button type="submit" id="submitButtonId">Submit</button>
@@ -187,7 +186,7 @@
         //#region Functions
 
         //#region Page init functions
-        function loadOptionToDropdown(sourceData, dropdownElement) {
+        function loadOptionToDropdown(sourceData, dropdownElement, selectedIndex) {
             clearDropdown(dropdownElement);
             sourceData.forEach(optionData => {
                 const option = document.createElement('option');
@@ -195,6 +194,9 @@
                 option.textContent = optionData;
                 dropdownElement.appendChild(option);
             });
+            if (sourceData.length > 0 && selectedIndex > -1) {
+                dropdownElement.selectedIndex = selectedIndex;
+            }
         }
 
         function clearDropdown(dropdownElement) {
@@ -285,17 +287,17 @@
                 sourcePONumbers = data.PONumbers;
                 sourceColors = data.Colors;
                 sourceStyles = extractUniqueStyles(data.Operations);
-
+                console.log({ sourceStyles });
                 Object.freeze(sourceMasterData);
                 Object.freeze(sourceOperationNames);
                 Object.freeze(sourcePONumbers);
                 Object.freeze(sourceColors);
                 Object.freeze(sourceStyles);
 
-                loadOptionToDropdown(sourceOperationNames, elementOfOperation());
-                loadOptionToDropdown(sourcePONumbers, elementOfPONumber());
-                loadOptionToDropdown(sourceColors, elementOfColor());
-                loadOptionToDropdown(sourceStyles, elementOfStyle());
+                loadOptionToDropdown(sourceOperationNames, elementOfOperation(), 0);
+                loadOptionToDropdown(sourcePONumbers, elementOfPONumber(), 0);
+                loadOptionToDropdown(sourceColors, elementOfColor(), 0);
+                loadOptionToDropdown(sourceStyles, elementOfStyle(), 0);
                 setCurrentDate();
             }).catch(error => {
                 console.error('Error:', error);
@@ -309,8 +311,8 @@
             elementOfJob().selectedIndex = 0;
             elementOfEmployee().selectedIndex = 0;
 
-            loadOptionToDropdown(jobNames, elementOfJob());
-            loadOptionToDropdown(employees, elementOfEmployee());
+            loadOptionToDropdown(jobNames, elementOfJob(), -1);
+            loadOptionToDropdown(employees, elementOfEmployee(), -1);
             calculateAmount();
         });
 
