@@ -188,8 +188,6 @@
         //#region Page Init functions
         function loadOptionToDropdown(sourceData, dropdownElement, selectedIndex) {
             clearDropdown(dropdownElement);
-            console.log({ sourceData });
-
             sourceData.forEach(optionData => {
                 const option = document.createElement('option');
                 option.value = optionData;
@@ -202,7 +200,6 @@
         }
 
         function clearDropdown(dropdownElement) {
-            console.log('dropdownElement.children.length', dropdownElement.children.length);
             while (dropdownElement.children.length > 0) {
                 dropdownElement.removeChild(dropdownElement.lastChild);
             }
@@ -238,9 +235,10 @@
                 else {
                     console.error(`Employees object of "${operation}" Operation is not found in data.`);
                 }
-                // Extract operation names
-                if (sourceMasterData.Operations[operation].Jobs) {
-                    sourceMasterData.Operations[operation].Jobs.forEach(jobInfo => {
+                const styleName = elementOfStyle().value;
+                // Extract job names
+                if (sourceMasterData.Operations[operation].Jobs.some(x => x.style == styleName)) {
+                    sourceMasterData.Operations[operation].Jobs.filter(x => x.style == styleName).forEach(jobInfo => {
                         jobNames.push(jobInfo.Name);
                         jobRates.push(jobInfo.Cost);
                     });
@@ -309,13 +307,10 @@
         });
 
         elementOfOperation().addEventListener('change', function () {
-            console.log('operationChange event triggers');
             const { employees, jobNames, jobRates } = extractData(this.value);
             availableJobs = jobNames;
             availableJobRates = jobRates;
-            // elementOfJob().selectedIndex = 0;
-            // elementOfEmployee().selectedIndex = 0;
-
+            
             loadOptionToDropdown(jobNames, elementOfJob(), 0);
             loadOptionToDropdown(employees, elementOfEmployee(), 0);
             calculateAmount();
