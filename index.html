@@ -200,8 +200,7 @@
         }
 
         function clearDropdown(dropdownElement) {
-            // Remove all child elements except the first one
-            while (dropdownElement.children.length > 1) {
+            while (dropdownElement.children.length > 0) {
                 dropdownElement.removeChild(dropdownElement.lastChild);
             }
         }
