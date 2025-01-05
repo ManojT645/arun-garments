@@ -74,6 +74,11 @@
             font-weight: bold;
         }
 
+        select:invalid {
+            background-color: #ffff007d;
+            color: gray;
+        }
+
         input,
         select,
         button {
@@ -190,6 +195,7 @@
 
                 <label for="operation">Operation:</label>
                 <select id="operationId" name="operation" required>
+                    <option value="" disabled selected>Select Operation</option>
                 </select>
 
                 <label for="employee">Employee Name:</label>
@@ -205,6 +211,7 @@
 
                 <label for="color">Color:</label>
                 <select id="colorId" name="color" required>
+                    <option value="" disabled selected>Select Color</option>
                 </select>
 
                 <button type="submit" id="submitButtonId">Submit</button>
@@ -218,6 +225,7 @@
                 <input type="date" id="toDateId" name="toDate" required>
             </div>
             <button type="button" id="btnGetSalaryId">Get all employee's Salary</button>
+            <div id="salaryLoaderId" style="display: none;">🔄 Fetching employee's Salary...</div>
             <div class="table-container">
                 <table id="employeeTable">
                     <thead>
@@ -285,12 +293,20 @@
             return document.getElementById('amountId')
         }
 
-        function elementOfSubmitButton() {
+        function elementOfFormSubmitButton() {
             return document.getElementById('submitButtonId')
         }
 
-        function elementOfLoader() {
+        function elementOfGetSalaryButton() {
+            return document.getElementById('btnGetSalaryId')
+        }
+
+        function elementOfFormLoader() {
             return document.getElementById('loaderId')
+        }
+
+        function elementOfSalaryLoader() {
+            return document.getElementById('salaryLoaderId')
         }
 
         function elementOfGetSalaryButton() {
@@ -325,8 +341,8 @@
             };
         }
 
-        function loadOptionToDropdown(sourceData, dropdownElement, selectedIndex) {
-            clearDropdown(dropdownElement);
+        function loadOptionToDropdown(sourceData, dropdownElement, selectedIndex, clearIndex = 0) {
+            clearDropdown(dropdownElement, clearIndex);
             sourceData.forEach(optionData => {
                 const option = document.createElement('option');
                 option.value = optionData;
@@ -338,8 +354,8 @@
             }
         }
 
-        function clearDropdown(dropdownElement) {
-            while (dropdownElement.children.length > 0) {
+        function clearDropdown(dropdownElement, clearIndex) {
+            while (dropdownElement.children.length > clearIndex) {
                 dropdownElement.removeChild(dropdownElement.lastChild);
             }
         }
@@ -368,7 +384,7 @@
             if (!selectingJob) {
                 selectingJob = elementOfJob().value;
             }
-            const operationsCollection = sourceMasterData.Jobs[selectingJob].Operations.filter(x => x.Style == styleName);
+            const operationsCollection = sourceMasterData.Jobs[selectingJob].Operations.filter(x => x.Operation && x.Style == styleName);
 
             if (operationsCollection.length > 0) {
                 operationsCollection.forEach(o => {
@@ -415,13 +431,13 @@
             }
         }
 
-        function toggleSubmitAndLoader(submitStarted) {
-            if (submitStarted == true) {
-                elementOfSubmitButton().style.display = "none";
-                elementOfLoader().style.display = "flex";
+        function toggleButtonAndLoader(justButtonClicked, btn, loader) {
+            if (justButtonClicked == true) {
+                btn.style.display = "none";
+                loader.style.display = "flex";
             } else {
-                elementOfLoader().style.display = "none";
-                elementOfSubmitButton().style.display = "block";
+                loader.style.display = "none";
+                btn.style.display = "block";
             }
         }
         //#endregion
@@ -448,25 +464,36 @@
             elementOfFromDate().value = currentWeek.firstDay;
             elementOfToDate().value = currentWeek.lastDay;
 
-            fetch(atob(api)).then(response => response.json()).then(data => {
-                sourceMasterData = data;
-                sourceJobNames = Object.keys(data.Jobs);
-                sourcePONumbers = data.PONumbers;
-                sourceColors = data.Colors;
-                sourceStyles = extractUniqueStyles(data.Jobs);
+            fetch(atob(api)).then(response => response.json()).then(masterResponse => {
+                console.log({ masterResponse });
+
+                const filteredJobs = Object.keys(masterResponse.Jobs).reduce((acc, key) => {
+                    if (key !== "") {
+                        acc[key] = masterResponse.Jobs[key];
+                    }
+                    return acc;
+                }, {});
+
+                masterResponse.Jobs = filteredJobs;
+
+                sourceMasterData = masterResponse;
+                sourceJobNames = Object.keys(masterResponse.Jobs);
+                sourcePONumbers = masterResponse.PONumbers;
+                sourceColors = masterResponse.Colors;
+                sourceStyles = extractUniqueStyles(masterResponse.Jobs);
 
                 Object.freeze(sourceMasterData);
                 Object.freeze(sourceJobNames);
                 Object.freeze(sourcePONumbers);
                 Object.freeze(sourceColors);
                 Object.freeze(sourceStyles);
-                
+
                 loadOptionToDropdown(sourceStyles, elementOfStyle(), 0);
                 loadOptionToDropdown(sourceJobNames, elementOfJob(), 0);
                 const changeEvent = new Event('change');
                 elementOfJob().dispatchEvent(changeEvent);
                 loadOptionToDropdown(sourcePONumbers, elementOfPONumber(), 0);
-                loadOptionToDropdown(sourceColors, elementOfColor(), 0);
+                loadOptionToDropdown(sourceColors, elementOfColor(), 0, 1);
                 setCurrentDate();
             }).catch(error => {
                 console.error('Error:', error);
@@ -478,7 +505,7 @@
             availableOperations = operationsOfSelectedJob;
             availableOperationRates = ratesOfOperations;
 
-            loadOptionToDropdown(operationsOfSelectedJob, elementOfOperation(), 0);
+            loadOptionToDropdown(operationsOfSelectedJob, elementOfOperation(), 0, 1);
             loadOptionToDropdown(employees, elementOfEmployee(), 0);
             calculateAmount();
         });
@@ -488,7 +515,7 @@
             availableOperations = operationsOfSelectedJob;
             availableOperationRates = ratesOfOperations;
 
-            loadOptionToDropdown(operationsOfSelectedJob, elementOfOperation(), 0);
+            loadOptionToDropdown(operationsOfSelectedJob, elementOfOperation(), 0, 1);
             calculateAmount();
         });
 
@@ -507,18 +534,21 @@
 
         elementOfForm().addEventListener('submit', function (event) {
             event.preventDefault();
-            toggleSubmitAndLoader(true);
+            toggleButtonAndLoader(true, elementOfFormSubmitButton(), elementOfFormLoader());
             var formData = new FormData(event.target);
             fetch(atob(api), { method: 'POST', body: formData, mode: 'no-cors' }).then(response => response.text())
                 .then(data => {
-                    elementOfForm().reset();
+                    // elementOfForm().reset();
+                    elementOfOperation().selectedIndex = 0;
+                    elementOfQuantity().value = '';
                     setCurrentDate();
-                    toggleSubmitAndLoader(false);
+                    toggleButtonAndLoader(false, elementOfFormSubmitButton(), elementOfFormLoader());
                     alert('The data has been added into your Google sheet.');
                 }).catch(error => console.error('Error:', error));
         });
 
         elementOfGetSalaryButton().addEventListener('click', function (event) {
+            toggleButtonAndLoader(true, elementOfGetSalaryButton(), elementOfSalaryLoader());
             const tableBody = document.getElementById('employeeTable').getElementsByTagName('tbody')[0];
             while (tableBody.firstChild) {
                 tableBody.removeChild(tableBody.firstChild);
@@ -545,6 +575,7 @@
 
                         tableBody.appendChild(row);
                     });
+                    toggleButtonAndLoader(false, elementOfGetSalaryButton(), elementOfSalaryLoader());
                 }).catch(error => {
                     console.error('Error:', error);
                 });
